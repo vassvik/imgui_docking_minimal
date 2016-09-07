@@ -1,7 +1,7 @@
 ifeq ($(OS),Windows_NT)
 	LFLAGS = -lglfw3 -lopengl32 -lgdi32
 else
-	LFLAGS = -lGL -lglfw -x11 -lpthread
+	LFLAGS = -lGL -lglfw
 endif
 CFLAGS = -g -std=c++11
 IFLAGS = -Iimgui
