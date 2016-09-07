@@ -5,7 +5,7 @@ label    Scene1
 x        0
 y        19
 size_x   640
-size_y   338
+size_y   337
 status   0
 active   1
 opened   1
@@ -19,9 +19,9 @@ parent   3
 index    1
 label    Scene2
 x        0
-y        357
+y        356
 size_x   640
-size_y   338
+size_y   339
 status   0
 active   1
 opened   1
