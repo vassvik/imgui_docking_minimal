@@ -55,6 +55,7 @@ struct DockContext
 	{
 		Dock()
 			: id(0)
+			, label(nullptr)
 			, next_tab(nullptr)
 			, prev_tab(nullptr)
 			, parent(nullptr)
@@ -62,7 +63,6 @@ struct DockContext
 			, size(-1, -1)
 			, active(true)
 			, status(Status_Float)
-			, label(nullptr)
 			, opened(false)
 		{
 			location[0] = 0;
@@ -188,20 +188,21 @@ struct DockContext
 		}
 
 
-		char* label;
 		ImU32 id;
+		char* label;
 		Dock* next_tab;
 		Dock* prev_tab;
-		Dock* children[2];
 		Dock* parent;
-		bool active;
 		ImVec2 pos;
 		ImVec2 size;
+		bool active;
 		Status_ status;
+		bool opened;
+
+		Dock* children[2];
+		char location[16];
 		int last_frame;
 		int invalid_frames;
-		char location[16];
-		bool opened;
 		bool first;
 	};
 
@@ -283,7 +284,7 @@ struct DockContext
 			PushID(i);
 			if (!IsMouseDown(0)) dock.status = Status_Docked;
 
-			ImVec2 size = dock.children[0]->size;
+			//ImVec2 size = dock.children[0]->size;
 			ImVec2 dsize(0, 0);
 			SetCursorScreenPos(dock.children[1]->pos);
 			ImVec2 min_size0 = dock.children[0]->getMinSize();
@@ -374,8 +375,8 @@ struct DockContext
 		ImGui::PopStyleVar();
 	}
 
-
-	Dock* getDockAt(const ImVec2& pos) const
+	// Doesn't use input??
+	Dock* getDockAt(const ImVec2& /*pos*/) const
 	{
 		for (int i = 0; i < m_docks.size(); ++i)
 		{
@@ -1086,7 +1087,7 @@ struct DockContext
 
 		if (fp) {
 			int ival;
-			char str[64], str2[64];
+			char str2[64];
 			fscanf(fp, "docks %d", &ival);
 			printf("%d docks\n", ival);
 
@@ -1097,6 +1098,8 @@ struct DockContext
 
 			for (int i = 0; i < ival; i++) {
 				int id, id1, id2, id3, id4, id5;
+				int st;
+				int b1, b2;
 				char lab[32];
 				
 				fscanf(fp, "%s %d", str2, &id);
@@ -1105,9 +1108,9 @@ struct DockContext
 				fscanf(fp, "%s %f", str2, &m_docks[id]->pos.y);
 				fscanf(fp, "%s %f", str2, &m_docks[id]->size.x);
 				fscanf(fp, "%s %f", str2, &m_docks[id]->size.y);
-				fscanf(fp, "%s %d", str2, &m_docks[id]->status);
-				fscanf(fp, "%s %d", str2, &m_docks[id]->active);
-				fscanf(fp, "%s %d", str2, &m_docks[id]->opened);
+				fscanf(fp, "%s %d", str2, &st);
+				fscanf(fp, "%s %d", str2, &b1);
+				fscanf(fp, "%s %d", str2, &b2);
 				fscanf(fp, "%s %s", str2, &m_docks[id]->location[0]);
 				fscanf(fp, "%s %d", str2, &id1);
 				fscanf(fp, "%s %d", str2, &id2);
@@ -1123,6 +1126,9 @@ struct DockContext
 				m_docks[id]->prev_tab = getDockByIndex(id3);
 				m_docks[id]->next_tab = getDockByIndex(id4);
 				m_docks[id]->parent = getDockByIndex(id5);
+				m_docks[id]->status = (Status_)st;
+				m_docks[id]->active = b1;
+				m_docks[id]->opened = b2;
 				
 				tryDockToStoredLocation(*m_docks[id]);
 			}
@@ -1142,21 +1148,20 @@ void Print() {
 	for (int i = 0; i < g_dock.m_docks.size(); ++i)
 	{
 		ImGui::Text("i=%d this=%p state=(%d %d) pos=(%.0f %.0f) size=(%.0f %.0f) children=(%p %p) tabs=(%p %p) parent=%p status=%d  location='%s' label='%s'\n", i, 
-							 g_dock.m_docks[i],
+							 (void*)g_dock.m_docks[i],
 							 g_dock.m_docks[i]->active,
 							 g_dock.m_docks[i]->opened,
 							 g_dock.m_docks[i]->pos.x,
 							 g_dock.m_docks[i]->pos.y,
 							 g_dock.m_docks[i]->size.x,
 							 g_dock.m_docks[i]->size.y,
-							 g_dock.m_docks[i]->children[0],
-							 g_dock.m_docks[i]->children[1],
-							 g_dock.m_docks[i]->prev_tab,
-							 g_dock.m_docks[i]->next_tab,
-							 g_dock.m_docks[i]->parent,
+							 (void*)g_dock.m_docks[i]->children[0],
+							 (void*)g_dock.m_docks[i]->children[1],
+							 (void*)g_dock.m_docks[i]->prev_tab,
+							 (void*)g_dock.m_docks[i]->next_tab,
+							 (void*)g_dock.m_docks[i]->parent,
 							 g_dock.m_docks[i]->status,
 							 g_dock.m_docks[i]->location,
-
 							 g_dock.m_docks[i]->label);
 
 	}
