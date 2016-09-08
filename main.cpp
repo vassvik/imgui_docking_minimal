@@ -166,6 +166,7 @@ int main(int, char**)
         // Draw docking windows
         if (ImGui::BeginDock("Scene1", &show_scene1)) {   
             ImGui::Text("Text       Scene1!");
+            ImGui::Print();
         }
         ImGui::EndDock();
         if (ImGui::BeginDock("Scene2", &show_scene2)) {
