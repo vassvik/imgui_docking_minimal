@@ -11,61 +11,6 @@ static void error_callback(int error, const char* description)
 }
 
 
-static void ShowExampleMenuFile2()
-{
-    ImGui::MenuItem("(dummy menu)", NULL, false, false);
-    if (ImGui::MenuItem("New")) {}
-    if (ImGui::MenuItem("Open", "Ctrl+O")) {}
-    if (ImGui::BeginMenu("Open Recent"))
-    {
-        ImGui::MenuItem("fish_hat.c");
-        ImGui::MenuItem("fish_hat.inl");
-        ImGui::MenuItem("fish_hat.h");
-        if (ImGui::BeginMenu("More.."))
-        {
-            ImGui::MenuItem("Hello");
-            ImGui::MenuItem("Sailor");
-            if (ImGui::BeginMenu("Recurse.."))
-            {
-                ShowExampleMenuFile2();
-                ImGui::EndMenu();
-            }
-            ImGui::EndMenu();
-        }
-        ImGui::EndMenu();
-    }
-    if (ImGui::MenuItem("Save", "Ctrl+S")) {}
-    if (ImGui::MenuItem("Save As..")) {}
-    ImGui::Separator();
-    if (ImGui::BeginMenu("Options"))
-    {
-        static bool enabled = true;
-        ImGui::MenuItem("Enabled", "", &enabled);
-        ImGui::BeginChild("child", ImVec2(0, 60), true);
-        for (int i = 0; i < 10; i++)
-            ImGui::Text("Scrolling Text %d", i);
-        ImGui::EndChild();
-        static float f = 0.5f;
-        static int n = 0;
-        ImGui::SliderFloat("Value", &f, 0.0f, 1.0f);
-        ImGui::InputFloat("Input", &f, 0.1f);
-        ImGui::Combo("Combo", &n, "Yes\0No\0Maybe\0\0");
-        ImGui::EndMenu();
-    }
-    if (ImGui::BeginMenu("Colors"))
-    {
-        for (int i = 0; i < ImGuiCol_COUNT; i++)
-            ImGui::MenuItem(ImGui::GetStyleColName((ImGuiCol)i));
-        ImGui::EndMenu();
-    }
-    if (ImGui::BeginMenu("Disabled", false)) // Disabled
-    {
-        IM_ASSERT(0);
-    }
-    if (ImGui::MenuItem("Checked", NULL, true)) {}
-    if (ImGui::MenuItem("Quit", "Alt+F4")) {}
-}
-
 int resx = 1280;
 int resy = 720;
 
@@ -84,7 +29,7 @@ int main(int, char**)
     style.FramePadding = ImVec2(3.0f, 3.0f);
     style.FrameRounding = 2.0f;
 /*
-
+    // Optional color stuff
     style.Colors[ImGuiCol_Text]                  = ImVec4(0.78f, 0.78f, 0.78f, 1.00f);
     style.Colors[ImGuiCol_TextDisabled]          = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
     style.Colors[ImGuiCol_WindowBg]              = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
@@ -138,11 +83,16 @@ int main(int, char**)
     // Setup ImGui binding
     ImGui_ImplGlfw_Init(window, true);
 
-    bool show_test_window = false;
-    bool show_another_window = false;
     ImVec4 clear_color = ImColor(114, 144, 154);
 
     ImGui::LoadDock();
+
+    static bool show_scene1 = true;
+    static bool show_scene2 = true;
+    static bool show_scene3 = true;
+    static bool show_scene4 = true;
+    static bool show_scene5 = true;
+    static bool show_scene6 = true;
 
     // Main loop
     while (!glfwWindowShouldClose(window))
@@ -153,13 +103,34 @@ int main(int, char**)
         int display_w, display_h;
         glfwGetFramebufferSize(window, &display_w, &display_h);
 
-        int menu_height;
 
+        // Draw Main menu inline. Keep track of it's height
+        int menu_height;
         if (ImGui::BeginMainMenuBar())
         {
             if (ImGui::BeginMenu("File"))
             {
-                ShowExampleMenuFile2();
+                if (ImGui::MenuItem("New")) {}
+                if (ImGui::MenuItem("Open", "Ctrl+O")) {}
+                if (ImGui::BeginMenu("Open Recent"))
+                {
+                    ImGui::MenuItem("fish_hat.c");
+                    ImGui::MenuItem("fish_hat.inl");
+                    ImGui::MenuItem("fish_hat.h");
+                    if (ImGui::BeginMenu("More.."))
+                    {
+                        ImGui::MenuItem("Hello");
+                        ImGui::MenuItem("Sailor");
+                        ImGui::EndMenu();
+                    }
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Disabled", false)) // Disabled
+                {
+                    IM_ASSERT(0);
+                }
+                if (ImGui::MenuItem("Checked", NULL, true)) {}
+                if (ImGui::MenuItem("Quit", "Alt+F4")) {}
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Edit"))
@@ -178,74 +149,56 @@ int main(int, char**)
         }
 
         if (ImGui::GetIO().DisplaySize.y > 0) {
+            // Setup root docking window
             auto pos = ImVec2(0, menu_height);
             auto size = ImGui::GetIO().DisplaySize;
-
-
             size.y -= pos.y;
             ImGui::RootDock(pos, ImVec2(size.x, size.y - 25.0f));
 
+            // Draw status bar (no docking)
             ImGui::SetNextWindowSize(ImVec2(size.x, 25.0f), ImGuiSetCond_Always);
             ImGui::SetNextWindowPos(ImVec2(0, size.y - 6.0f), ImGuiSetCond_Always);
             ImGui::Begin("statusbar", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoResize);
-
             ImGui::Text("FPS: %f", ImGui::GetIO().Framerate);
-
             ImGui::End();
         }
 
-        bool show_sceneview = true;
-        ImGui::BeginDock("Scene1", &show_sceneview, ImGuiWindowFlags_MenuBar);
-            ImGui::Print();
-
-
-        ImGui::Text("No camera in scene!");
-
-
-        ImGui::EndDock();
-        ImGui::BeginDock("Scene2", &show_sceneview, ImGuiWindowFlags_MenuBar);
-        
-
-        ImGui::Text("No camera in scene!");
-
-
-        ImGui::EndDock();
-
-
-        ImGui::BeginDock("Scene3", &show_sceneview, ImGuiWindowFlags_MenuBar);
-        
-
-        ImGui::Text("No camera in scene!");
-
-
-        ImGui::EndDock();
-
-    
-
-        // 2. Show another simple window, this time using an explicit Begin/End pair
-        if (show_another_window)
-        {
-            ImGui::SetNextWindowSize(ImVec2(200,100), ImGuiSetCond_FirstUseEver);
-            ImGui::Begin("Another Window", &show_another_window);
-            ImGui::Text("Hello");
-            ImGui::End();
+        // Draw docking windows
+        if (ImGui::BeginDock("Scene1", &show_scene1)) {   
+            ImGui::Text("Text       Scene1!");
         }
-
-        // 3. Show the ImGui test window. Most of the sample code is in ImGui::ShowTestWindow()
-        if (show_test_window)
-        {
-            ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);
-            ImGui::ShowTestWindow(&show_test_window);
+        ImGui::EndDock();
+        if (ImGui::BeginDock("Scene2", &show_scene2)) {
+            ImGui::Text("Text       Scene2!");
         }
+        ImGui::EndDock();
+        if(ImGui::BeginDock("Scene3", &show_scene3)) {
+           ImGui::Text("Text       Scene3!");
+        }
+        ImGui::EndDock();
+        if(ImGui::BeginDock("Scene4", &show_scene4)) {
+            ImGui::Text("Text       Scene4!");
+        }
+        ImGui::EndDock();
+        if(ImGui::BeginDock("Scene5", &show_scene5)) {
+            ImGui::Text("Text       Scene5!");
+        }
+        ImGui::EndDock();
+
+        if (ImGui::BeginDock("Scene6", &show_scene6)) {
+            ImGui::Text("Text       Scene6!");
+        }
+        ImGui::EndDock();
+
 
         // Rendering
-        
         glViewport(0, 0, display_w, display_h);
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui::Render();
         glfwSwapBuffers(window);
     }
+
     ImGui::SaveDock();
 
     // Cleanup
