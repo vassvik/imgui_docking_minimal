@@ -105,7 +105,7 @@ int main(int, char**)
 
 
         // Draw Main menu inline. Keep track of it's height
-        int menu_height;
+        int menu_height = 0;
         if (ImGui::BeginMainMenuBar())
         {
             if (ImGui::BeginMenu("File"))
