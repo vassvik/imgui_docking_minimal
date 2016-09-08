@@ -6,7 +6,7 @@ LumixEngine's code uses Lua for layout loading and saving. These have been remov
 
 The main program itself is a modified version of opengl2_example from the imgui repo. It has a menubar, and has 3 docked windows that can me rearranged how you see fit. 
 
-A simple Makefile for Windows (MinGW64-w64) is included, and a simple layout file (that matches the code in main.cpp) is included. This will update after modification of the layout while running the program. 
+A simple Makefile for Windows (MinGW64-w64) and Linux (Arch?) is included, and a simple layout file (that matches the code in main.cpp) is included, that will update after modification of the layout while running the program. 
 
 ## Dependencies:
  - GLFW3
