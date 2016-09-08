@@ -3,7 +3,7 @@ ifeq ($(OS),Windows_NT)
 else
 	LFLAGS = -lGL -lglfw
 endif
-CFLAGS = -std=c++11
+CFLAGS = -std=c++11 -Wall -Wextra -Wpedantic
 IFLAGS = -Iimgui
 SRCS = main.cpp imgui/{imgui,imgui_draw,imgui_demo,imgui_dock,imgui_impl_glfw}.cpp
 CC = g++
