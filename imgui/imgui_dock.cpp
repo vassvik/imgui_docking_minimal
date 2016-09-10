@@ -677,6 +677,7 @@ struct DockContext
 			ImU32 color_active = GetColorU32(ImGuiCol_FrameBgActive);
 			ImU32 color_hovered = GetColorU32(ImGuiCol_FrameBgHovered);
 			ImU32 text_color = GetColorU32(ImGuiCol_Text);
+			ImU32 text_color_disabled = GetColorU32(ImGuiCol_TextDisabled);
 			float line_height = GetTextLineHeightWithSpacing();
 			float tab_base;
 
@@ -702,30 +703,33 @@ struct DockContext
 
 				bool hovered = IsItemHovered();
 				ImVec2 pos = GetItemRectMin();
-				if (dock_tab->active && close_button)
-				{
-					size.x += 16 + GetStyle().ItemSpacing.x;
-					SameLine();
-					tab_closed = InvisibleButton("close", ImVec2(16, 16));
-					ImVec2 center = (GetItemRectMin() + GetItemRectMax()) * 0.5f;
-					draw_list->AddLine(
-						center + ImVec2(-3.5f, -3.5f), center + ImVec2(3.5f, 3.5f), text_color);
-					draw_list->AddLine(
-						center + ImVec2(3.5f, -3.5f), center + ImVec2(-3.5f, 3.5f), text_color);
-				}
+				size.x += 20 + GetStyle().ItemSpacing.x;
+				
 				tab_base = pos.y;
-				draw_list->PathClear();
-				draw_list->PathLineTo(pos + ImVec2(-15, size.y));
-				draw_list->PathBezierCurveTo(
-					pos + ImVec2(-10, size.y), pos + ImVec2(-5, 0), pos + ImVec2(0, 0), 10);
-				draw_list->PathLineTo(pos + ImVec2(size.x, 0));
-				draw_list->PathBezierCurveTo(pos + ImVec2(size.x + 5, 0),
-					pos + ImVec2(size.x + 10, size.y),
-					pos + ImVec2(size.x + 15, size.y),
-					10);
-				draw_list->PathFill(
-					hovered ? color_hovered : (dock_tab->active ? color_active : color));
+
+				draw_list->AddRectFilled(pos+ImVec2(-8.0f, 0.0),
+										 pos+size,
+										 hovered ? color_hovered : (dock_tab->active ? color_active : color));
 				draw_list->AddText(pos, text_color, dock_tab->label, text_end);
+
+				if (dock_tab->active && close_button)
+                    {
+                        SameLine();
+                        tab_closed = InvisibleButton("close", ImVec2(16, 16));
+
+                        ImVec2 center = ((GetItemRectMin() + GetItemRectMax()) * 0.5f);
+                        draw_list->AddLine( center + ImVec2(-3.5f, -3.5f), center + ImVec2(3.5f, 3.5f), text_color);
+                        draw_list->AddLine( center + ImVec2(3.5f, -3.5f), center + ImVec2(-3.5f, 3.5f), text_color);
+                    } else {
+                        if(!dock_tab->active && close_button) {
+                            SameLine();
+                            InvisibleButton("close", ImVec2(16, 16));
+
+                            ImVec2 center = ((GetItemRectMin() + GetItemRectMax()) * 0.5f);
+                            draw_list->AddLine( center + ImVec2(-3.5f, -3.5f), center + ImVec2(3.5f, 3.5f), text_color_disabled);
+                            draw_list->AddLine( center + ImVec2(3.5f, -3.5f), center + ImVec2(-3.5f, 3.5f), text_color_disabled);
+                        }
+                    }
 
 				dock_tab = dock_tab->next_tab;
 			}
