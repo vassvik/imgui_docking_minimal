@@ -3,9 +3,9 @@ docks 9
 index    0
 label    Docks
 x        0
-y        515
+y        514
 size_x   1280
-size_y   180
+size_y   181
 status   0
 active   1
 opened   1
@@ -18,10 +18,10 @@ parent   8
 
 index    1
 label    Dummy1
-x        191
+x        190
 y        19
-size_x   719
-size_y   496
+size_x   720
+size_y   495
 status   0
 active   0
 opened   1
@@ -36,8 +36,8 @@ index    2
 label    Dummy2
 x        0
 y        19
-size_x   191
-size_y   496
+size_x   190
+size_y   495
 status   0
 active   0
 opened   1
@@ -50,10 +50,10 @@ parent   7
 
 index    3
 label    Cube
-x        191
+x        190
 y        19
-size_x   719
-size_y   496
+size_x   720
+size_y   495
 status   0
 active   1
 opened   1
@@ -68,8 +68,8 @@ index    4
 label    Dummy3
 x        0
 y        19
-size_x   191
-size_y   496
+size_x   190
+size_y   495
 status   0
 active   1
 opened   1
@@ -85,7 +85,7 @@ label    StyleEditor
 x        910
 y        19
 size_x   370
-size_y   496
+size_y   495
 status   0
 active   1
 opened   1
@@ -101,7 +101,7 @@ label    NULL
 x        0
 y        19
 size_x   1280
-size_y   496
+size_y   495
 status   0
 active   1
 opened   0
@@ -117,7 +117,7 @@ label    NULL
 x        0
 y        19
 size_x   910
-size_y   496
+size_y   495
 status   0
 active   1
 opened   0
