@@ -1,9 +1,11 @@
 #define IMGUI_DISABLE_INCLUDE_IMCONFIG_H
+
 #include <imgui.h>
 //#include "imgui_impl_glfw.h"
 #include "imgui_impl_glfw_gl3.h"
 #include "imgui_dock.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <GL/glew.h>    // extension loading
 #include <GLFW/glfw3.h>
 
