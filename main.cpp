@@ -29,6 +29,7 @@ GLuint VertexArrayID;
 
 GLuint vertexbuffer;
 GLuint elementbuffer;
+int num_indices;
 
 GLuint sizebuffer;
 GLuint positionbuffer;
@@ -37,13 +38,12 @@ GLuint startbuffer;
 GLuint stopbuffer;
 GLuint indexbuffer;
 
-int num_indices;
 
+// Framebuffer stuff
 GLuint framebuffer;
 GLuint texture;
 GLuint depthbuffer;
 
-GLuint quad_VertexArrayID;
 GLuint quad_vertexbuffer;
 
 int textureX = resx;
@@ -111,7 +111,7 @@ void init_GLFW_GLEW() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    window = glfwCreateWindow(resx, resy, "ImGui OpenGL2 example", NULL, NULL);
+    window = glfwCreateWindow(resx, resy, "ImGui OpenGL3 Docking", NULL, NULL);
     if (!window) {
         fprintf(stderr, "Failed to create window\n"); fflush(stderr);
         exit(-2);
