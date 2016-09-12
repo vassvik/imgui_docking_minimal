@@ -16,6 +16,12 @@ endif
 
 all: $(SRCS) $(EXE)
 
+debug: CFLAGS += -g
+debug: $(SRCS) $(EXE) 
+
+release: CFLAGS += -g
+release: $(SRCS) $(EXE) 
+
 $(EXE): $(OBJS)
 	$(CC) $(OBJS) -o $@ $(LFLAGS)
 
@@ -23,4 +29,4 @@ $(EXE): $(OBJS)
 	$(CC) $(CFLAGS) $(IFLAGS) $< -o $@
 
 clean:
-	rm -v	 $(OBJS) $(EXE)
+	rm -v $(OBJS) $(EXE)
