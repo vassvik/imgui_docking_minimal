@@ -1053,7 +1053,7 @@ struct DockContext
 			Dock& dock = *m_docks[i];
 
 			fprintf(fp, "index    %d\n", i);
-			fprintf(fp, "label    %s\n", dock.label[0] == '\0' ? "NULL" : dock.label);
+			fprintf(fp, "label    %s\n", dock.parent ? (dock.label[0] == '\0' ? "DOCK" : dock.label) : "ROOT"),
 			fprintf(fp, "x        %d\n", (int)dock.pos.x);
 			fprintf(fp, "y        %d\n", (int)dock.pos.y);
 			fprintf(fp, "size_x   %d\n", (int)dock.size.x);
@@ -1151,7 +1151,7 @@ static DockContext g_dock;
 void Print() {
 	for (int i = 0; i < g_dock.m_docks.size(); ++i)
 	{
-		ImGui::Text("i=%d this=%p state=(%d %d) pos=(%.0f %.0f) size=(%.0f %.0f) children=(%p %p) tabs=(%p %p) parent=%p status=%d  location='%s' label='%s'\n", i, 
+		ImGui::Text("i=%d this=0x%.8p state=(%d %d) pos=(%.0f %.0f) size=(%.0f %.0f) children=(%s %s) tabs=(%s %s) parent=%s status=%d  location='%s' label='%s'\n", i, 
 							 (void*)g_dock.m_docks[i],
 							 g_dock.m_docks[i]->active,
 							 g_dock.m_docks[i]->opened,
@@ -1159,11 +1159,11 @@ void Print() {
 							 g_dock.m_docks[i]->pos.y,
 							 g_dock.m_docks[i]->size.x,
 							 g_dock.m_docks[i]->size.y,
-							 (void*)g_dock.m_docks[i]->children[0],
-							 (void*)g_dock.m_docks[i]->children[1],
-							 (void*)g_dock.m_docks[i]->prev_tab,
-							 (void*)g_dock.m_docks[i]->next_tab,
-							 (void*)g_dock.m_docks[i]->parent,
+							 (void*)g_dock.m_docks[i]->children[0] ? g_dock.m_docks[i]->children[0]->label : "None",
+							 (void*)g_dock.m_docks[i]->children[1] ? g_dock.m_docks[i]->children[1]->label : "None",
+							 (void*)g_dock.m_docks[i]->prev_tab ? g_dock.m_docks[i]->prev_tab->label : "None",
+							 (void*)g_dock.m_docks[i]->next_tab ? g_dock.m_docks[i]->next_tab->label : "None",
+							 (void*)g_dock.m_docks[i]->parent ? g_dock.m_docks[i]->parent->label : "None",
 							 g_dock.m_docks[i]->status,
 							 g_dock.m_docks[i]->location,
 							 g_dock.m_docks[i]->label);

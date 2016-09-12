@@ -50,7 +50,7 @@ GLuint depthbuffer;
 int textureX = resx;
 int textureY = resy;
 
-
+float rotateX = 10.0, rotateY = 0.0;
 
 char *readFile(const char *filename);
 void CompileShader(const char * file_path, GLuint ShaderID);
@@ -394,12 +394,7 @@ void draw_cube() {
     // same RNG seed every frame  //
     // "minimal standard" LCG RNG //
     ////////////////////////////////
-    unsigned int IBM = 12321231;
-    float rr = 60 + ((IBM *= 16807)/float((unsigned int)(-1)))*60;   // angular velocity, between 60 and 120 degrees per second
-    float rr1 = (IBM *= 16807)/float((unsigned int)(-1))*2 + 1;      // x-axis, between -1 and 1
-    float rr2 = (IBM *= 16807)/float((unsigned int)(-1))*2 + 1;      // y-axis, between -1 and 1
-    float rr3 = (IBM *= 16807)/float((unsigned int)(-1))*2 + 1;      // z-axis, between -1 and 1
-    mat4 Model = rotate(vec3(rr1,rr2,rr3), glfwGetTime()*rr*1);
+    mat4 Model = rotate(vec3(1.0, 0.0, 0.0), rotateX)*rotate(vec3(0.0, 1.0, 0.0), rotateY);
 
     mat4 MVP = Projection*View*Model;
     glUniformMatrix4fv(glGetUniformLocation(cube_program, "MVP"), 1, GL_FALSE, &MVP.M[0][0]); 
@@ -483,31 +478,45 @@ void cube_GUI() {
     ImGui::Image((ImTextureID)texture, size, ImVec2(0, 0), ImVec2(1, -1));
 
     bool isHovered = ImGui::IsItemHovered();
-    bool isClicked = ImGui::IsMouseClicked(0, false);
+    bool isLeftClicked = ImGui::IsMouseClicked(0, false);
+    bool isRightClicked = ImGui::IsMouseClicked(1, false);
     bool isFocused = ImGui::IsWindowFocused();
 
     ////////////////////////////////////////////////////////////////////////////////////
     // So we can move the camera while the mouse cursor is outside the docking window //
     // but the button is not released yet                                             //
     ////////////////////////////////////////////////////////////////////////////////////
-    static bool clickedWhileHovered = false;
-    if (isHovered && isClicked) {
-        clickedWhileHovered = true;
+    static bool clickedLeftWhileHovered = false;
+    static bool clickedRightWhileHovered = false;
+    if (isHovered && isLeftClicked) {
+        clickedLeftWhileHovered = true;
+    }
+    if (isHovered && isRightClicked) {
+        clickedRightWhileHovered = true;
     }
 
     /////////////////////////////////////////////////////////////////////////////
     // Only do input if the window containing the image is in focus (activaed) //
     /////////////////////////////////////////////////////////////////////////////
     if (isFocused) {
-        if (clickedWhileHovered) {
-            clickedWhileHovered = io.MouseDown[0];
+        ImVec2 mouseDelta = io.MouseDelta;
 
+        if (clickedLeftWhileHovered) {
+            clickedLeftWhileHovered = io.MouseDown[0];
             if (io.MouseDown[0]) {
-                ImVec2 mouseDelta = io.MouseDelta;
                 cam_x -= mouseDelta.x/size.x*cam_width;
                 cam_y += mouseDelta.y/size.y*cam_height;
-            }
+            } 
         }
+        if (clickedRightWhileHovered) {
+            clickedRightWhileHovered = io.MouseDown[1];
+            if (io.MouseDown[1]) {
+                float degreesPerPixel = 1.0;
+                rotateX += degreesPerPixel*mouseDelta.y;
+                rotateY += degreesPerPixel*mouseDelta.x;
+            } 
+        }
+
 
         float speed = 3; // 3 units per second
         if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL)) speed *=  0.1; // slow
