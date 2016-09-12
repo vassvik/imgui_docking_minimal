@@ -1,7 +1,7 @@
 ifeq ($(OS),Windows_NT)
 	LFLAGS = -lglfw3 -lglew32 -lopengl32 -lgdi32
 else
-	LFLAGS = -lGL -lglfw
+	LFLAGS = -lGL -lglfw -lGLEW
 endif
 CFLAGS = -DGLEW_STATIC -std=c++11 #-Wall -Wextra -Wpedantic
 IFLAGS = -Iimgui
