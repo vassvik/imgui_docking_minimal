@@ -1,22 +1,26 @@
 SHELL=/bin/bash
 
-ifeq ($(OS),Windows_NT)
-	LFLAGS = -lglfw3 -lglew32 -lopengl32 -lgdi32
-else
-	LFLAGS = -lGL -lglfw -lGLEW
-endif
-CFLAGS = -DGLEW_STATIC -std=c++11 #-Wall -Wextra -Wpedantic
+CFLAGS = -c -DGLEW_STATIC -std=c++11 #-Wall -Wextra -Wpedantic
 IFLAGS = -Iimgui
-SRCS = main.cpp imgui/{imgui,imgui_draw,imgui_demo,imgui_dock,imgui_impl_glfw_gl3}.cpp
+SRCS = imgui/imgui.cpp imgui/imgui_draw.cpp imgui/imgui_demo.cpp imgui/imgui_dock.cpp imgui/imgui_impl_glfw_gl3.cpp main.cpp
+OBJS = $(SRCS:.cpp=.o)
 CC = g++
 
-all:
-	$(CC) $(CFLAGS) $(IFLAGS) $(SRCS) $(LFLAGS)
+ifeq ($(OS),Windows_NT)
+	LFLAGS = -lglfw3 -lglew32 -lopengl32 -lgdi32
+	EXE=a.exe
+else
+	LFLAGS = -lGL -lglfw -lGLEW
+	EXE=a.out
+endif
 
+all: $(SRCS) $(EXE)
 
-debug:
-	$(CC) $(CFLAGS) $(IFLAGS) $(SRCS) $(LFLAGS) -g
+$(EXE): $(OBJS)
+	$(CC) $(OBJS) -o $@ $(LFLAGS)
 
+.cpp.o:
+	$(CC) $(CFLAGS) $(IFLAGS) $< -o $@
 
-release:
-	$(CC) $(CFLAGS) $(IFLAGS) $(SRCS) $(LFLAGS) -O2
+clean:
+	rm -v	 $(OBJS) $(EXE)

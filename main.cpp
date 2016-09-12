@@ -475,7 +475,9 @@ void cube_GUI() {
     //////////////////////////////////////////////////////
     // Draw the image/texture, filling the whole window //
     //////////////////////////////////////////////////////
-    ImGui::Image((ImTextureID)texture, size, ImVec2(0, 0), ImVec2(1, -1));
+    //ImGui::Image(reinterpret_cast<ImTextureID>(texture), size, ImVec2(0, 0), ImVec2(1, -1));
+    ImGui::Image((ImTextureID)((size_t)texture), size, ImVec2(0, 0), ImVec2(1, -1));
+
 
     bool isHovered = ImGui::IsItemHovered();
     bool isLeftClicked = ImGui::IsMouseClicked(0, false);
@@ -517,7 +519,6 @@ void cube_GUI() {
             } 
         }
 
-
         float speed = 3; // 3 units per second
         if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL)) speed *=  0.1; // slow
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT))   speed *= 10.0;  // fast
@@ -526,6 +527,7 @@ void cube_GUI() {
         float deltaMoveRight   = speed*(glfwGetKey(window, GLFW_KEY_D) - glfwGetKey(window, GLFW_KEY_A));
         float deltaMoveUp      = speed*(glfwGetKey(window, GLFW_KEY_E) - glfwGetKey(window, GLFW_KEY_Q));
         
+
         // move camera...
         float dt = io.DeltaTime;
         cam_x += dt*deltaMoveRight;
