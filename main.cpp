@@ -46,13 +46,9 @@ GLuint framebuffer;
 GLuint texture;
 GLuint depthbuffer;
 
-GLuint quad_vertexbuffer;
 
 int textureX = resx;
 int textureY = resy;
-bool updateTexture = false;
-
-GLuint quad_program;
 
 
 
@@ -69,6 +65,8 @@ void cube_GUI();
 int main_menu_GUI();
 void do_GUI();
 
+bool fullscreen = false;
+
 int main(int, char**) {
     init_GLFW_GLEW();
     init_GL();
@@ -81,13 +79,13 @@ int main(int, char**) {
         glfwGetFramebufferSize(window, &resx, &resy);
         ImGui_ImplGlfwGL3_NewFrame();
 
-        draw_cube();
         do_GUI();
 
         // Rendering
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, resx, resy);
         glClear(GL_COLOR_BUFFER_BIT);
+
         ImGui::Render();
         glfwSwapBuffers(window);
     }
@@ -190,18 +188,16 @@ void init_GL() {
         1.0, 0.1, 0.1, 
         1.0, 0.2, 0.2, 
         1.0, 0.3, 0.3,
-        1.0, 0.2, 0.2
     };
 
     const GLfloat instancePositions[] {
         0.0, 0.0, 0.0,
-        sqrt(3), 0.0, 0.0,
-        0.0, sqrt(3), 0.0,
-        sqrt(3), sqrt(3), 0.0
+        2.0, 0.0, 0.0,
+        1.0, sqrt(3), 0.0,
     };
 
     const GLfloat instanceRotate[] {
-        45.0, 135.0, 135.0, 45.0
+        30.0, 150.0, 90.0
     };
 
 
@@ -221,23 +217,20 @@ void init_GL() {
 
     const GLfloat instanceStart[] = {
         0.7, 0.0, 0.0, 0.0,
-        0.2, 0.0, 0.0, 0.0,
         0.0, 0.5, 0.0, 0.0,
         0.0, 0.2, 0.4, 0.6
     };
 
     const GLfloat instanceStop[] = {
         1.0, 0.0, 0.0, 0.0,
-        0.5, 0.0, 0.0, 0.0,
         0.3, 1.0, 0.0, 0.0,
         0.1, 0.3, 0.5, 0.8
     };
 
     const GLfloat instanceIndex[] {
         0.0, -1.0, -1.0, -1.0,
-        1.0, -1.0, -1.0, -1.0,
-        0.0, 2.0, -1.0, -1.0,
-        0.0, 3.0, 4.0, 5.0
+        1.0, 0.0, -1.0, -1.0,
+        0.0, 2.0, 3.0, 4.0
     };
 
     glGenBuffers(1, &startbuffer);
@@ -253,25 +246,6 @@ void init_GL() {
     glGenBuffers(1, &elementbuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,  sizeof(cubeIndices), cubeIndices, GL_STATIC_DRAW);
-
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Create program for drawing the texture, create VBOs and copy the data //
-    ///////////////////////////////////////////////////////////////////////////
-    quad_program = LoadShaders("Passthrough.vs", "SimpleTexture.fs");
-
-    const GLfloat g_quad_vertex_buffer_data[] = {
-       -1.0f, -1.0f, 0.0f,
-        1.0f, -1.0f, 0.0f,
-       -1.0f,  1.0f, 0.0f,
-       -1.0f,  1.0f, 0.0f,
-        1.0f, -1.0f, 0.0f,
-        1.0f,  1.0f, 0.0f,
-    };
-
-    glGenBuffers(1, &quad_vertexbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_quad_vertex_buffer_data), g_quad_vertex_buffer_data, GL_STATIC_DRAW);
 
 
     ////////////////////////////////////////////////////////////////////////
@@ -368,23 +342,20 @@ void init_ImGUI() {
 void draw_cube() {
     const GLfloat instanceStart[] = {
         0.7, 0.0, 0.0, 0.0,
-        0.2, 0.0, 0.0, 0.0,
         0.0, 0.5, 0.0, 0.0,
         0.0, 0.2, 0.4, 0.6
     };
 
     const GLfloat instanceStop[] = {
         1.0, 0.0, 0.0, 0.0,
-        0.5, 0.0, 0.0, 0.0,
         0.3, 1.0, 0.0, 0.0,
         0.1, 0.3, 0.5, 0.8
     };
 
     const GLfloat instanceIndex[] {
         0.0, -1.0, -1.0, -1.0,
-        1.0, -1.0, -1.0, -1.0,
-        0.0, 2.0, -1.0, -1.0,
-        0.0, 3.0, 4.0, 5.0
+        1.0, 0.0, -1.0, -1.0,
+        0.0, 2.0, 3.0, 4.0
     };
 
     glBindBuffer(GL_ARRAY_BUFFER, startbuffer);
@@ -404,9 +375,6 @@ void draw_cube() {
     // with camera looking along the negative Z axis                    //
     // The cube rotates around a random axis                            //
     //////////////////////////////////////////////////////////////////////
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureX, textureY, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
 
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
     glViewport(0,0,textureX,textureY);
@@ -474,7 +442,7 @@ void draw_cube() {
     glVertexAttribDivisor(6, 1);
 
     //glDrawElements(GL_TRIANGLE_STRIP, 14, GL_UNSIGNED_BYTE, (void*)0);
-    glDrawElementsInstanced(GL_TRIANGLE_STRIP, num_indices, GL_UNSIGNED_BYTE, (void*)0, 4);
+    glDrawElementsInstanced(GL_TRIANGLE_STRIP, num_indices, GL_UNSIGNED_BYTE, (void*)0, 3);
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
     glDisableVertexAttribArray(2);
@@ -495,7 +463,14 @@ void cube_GUI() {
         textureX = size.x;
         textureY = size.y;
         cam_width = cam_height*textureX/float(textureY);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureX, textureY, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+
     }
+
+    draw_cube();
 
     ImGuiIO& io = ImGui::GetIO();
     static ImVec2 imagePos = ImVec2(textureX/2, textureY/2); // If mouse cursor is outside the screen, use center of image as zoom point
@@ -564,6 +539,10 @@ void cube_GUI() {
 
         cam_width *= zoomFactor;
         cam_height *= zoomFactor;
+
+        if (ImGui::IsMouseDoubleClicked(0)) {
+            fullscreen = !fullscreen;
+        }
     }
 }
 
@@ -595,7 +574,7 @@ int main_menu_GUI() {
             {
                 IM_ASSERT(0);
             }
-            if (ImGui::MenuItem("Checked", NULL, true)) {}
+            if (ImGui::MenuItem("Fullscreen", NULL, true)) {fullscreen = !fullscreen;}
             if (ImGui::MenuItem("Quit", "Alt+F4")) {}
             ImGui::EndMenu();
         }
@@ -627,6 +606,7 @@ void do_GUI() {
 
     int menu_height = main_menu_GUI();
 
+
     if (ImGui::GetIO().DisplaySize.y > 0) {
         ////////////////////////////////////////////////////
         // Setup root docking window                      //
@@ -645,32 +625,50 @@ void do_GUI() {
         ImGui::End();
     }
 
-    // Draw docking windows
-    if (ImGui::BeginDock("Docks", &show_scene1)) {   
-        ImGui::Print(); // print docking information
-    }
-    ImGui::EndDock();
-    if (ImGui::BeginDock("Dummy1", &show_scene2)) {
-        ImGui::Text("Placeholder!");
-    }
-    ImGui::EndDock();
-    if(ImGui::BeginDock("Dummy2", &show_scene3)) {
-       ImGui::Text("Placeholder!");
-    }
-    ImGui::EndDock();
-    if(ImGui::BeginDock("Cube", &show_scene4, ImGuiWindowFlags_NoScrollbar)) {
-        cube_GUI();
-    }
-    ImGui::EndDock();
-    if(ImGui::BeginDock("Dummy3", &show_scene5)) {
-        ImGui::Text("Placeholder!");
-    }
-    ImGui::EndDock();
+    if (fullscreen) {
+        ImGui::SetNextWindowSize(ImVec2(resx, resy), ImGuiSetCond_Always);
+        ImGui::SetNextWindowPos(ImVec2(0.0, 0.0), ImGuiSetCond_Always);
+        if (ImGui::Begin("Fullscreen", &fullscreen, ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoTitleBar)) {   
+            cube_GUI();
 
-    if (ImGui::BeginDock("StyleEditor", &show_scene6)) {
-        ImGui::ShowStyleEditor();
+            if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+                fullscreen = false;
+            }
+        }
+        ImGui::End();
+    } else {
+
+        // Draw docking windows
+        if (ImGui::BeginDock("Docks", &show_scene1)) {   
+            ImGui::Print(); // print docking information
+        }
+        ImGui::EndDock();
+        if (ImGui::BeginDock("Dummy1", &show_scene2)) {
+            ImGui::Text("Placeholder!");
+        }
+        ImGui::EndDock();
+        if(ImGui::BeginDock("Dummy2", &show_scene3)) {
+           ImGui::Text("Placeholder!");
+        }
+        ImGui::EndDock();
+        if(ImGui::BeginDock("Cube", &show_scene4, ImGuiWindowFlags_NoScrollbar)) {
+            cube_GUI();
+        }
+        ImGui::EndDock();
+        if(ImGui::BeginDock("Dummy3", &show_scene5)) {
+            ImGui::Text("Placeholder!");
+        }
+        ImGui::EndDock();
+
+        if (ImGui::BeginDock("StyleEditor", &show_scene6)) {
+            ImGui::ShowStyleEditor();
+        }
+        ImGui::EndDock();
+
     }
-    ImGui::EndDock();
+
+    
+
 }
 
 char *readFile(const char *filename) {
