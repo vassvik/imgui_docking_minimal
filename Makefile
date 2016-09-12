@@ -1,3 +1,5 @@
+SHELL=/bin/bash
+
 ifeq ($(OS),Windows_NT)
 	LFLAGS = -lglfw3 -lglew32 -lopengl32 -lgdi32
 else
