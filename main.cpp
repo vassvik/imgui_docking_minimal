@@ -30,6 +30,15 @@ GLuint VertexArrayID;
 GLuint vertexbuffer;
 GLuint elementbuffer;
 
+GLuint sizebuffer;
+GLuint positionbuffer;
+GLuint rotatebuffer;
+GLuint startbuffer;
+GLuint stopbuffer;
+GLuint indexbuffer;
+
+int num_indices;
+
 GLuint framebuffer;
 GLuint texture;
 GLuint depthbuffer;
@@ -134,6 +143,31 @@ void init_GL() {
     ////////////////////////////////////////////////////////////////////
     cube_program = LoadShaders("vertex_shader.vs", "fragment_shader.fs");
 
+    // Actually a cylinder with 20 triangles
+    const int n = 10;
+    num_indices = 2*n+2;
+
+    GLfloat cubeVertices[n*2*3];
+    GLubyte cubeIndices[2*n+2];
+    for (int i = 0; i < n; i++) {
+        float x = cos(2*PI*i/float(n));
+        float y = sin(2*PI*i/float(n));
+        cubeVertices[2*3*i + 0] = -1.0;
+        cubeVertices[2*3*i + 1] = x;
+        cubeVertices[2*3*i + 2] = y;
+        cubeVertices[2*3*i + 3] = 1.0;
+        cubeVertices[2*3*i + 4] = x;
+        cubeVertices[2*3*i + 5] = y;
+
+        cubeIndices[2*i+0] = 2*i + 0;
+        cubeIndices[2*i+1] = 2*i + 1;
+
+    }
+    cubeIndices[2*n+0] = 0;
+    cubeIndices[2*n+1] = 1;
+
+
+    /*
     const GLfloat cubeVertices[] = {
        -1.0, -1.0,  1.0,
         1.0, -1.0,  1.0,
@@ -148,10 +182,72 @@ void init_GL() {
     const GLubyte cubeIndices[] = {
         0, 1, 2, 3, 7, 1, 5, 4, 7, 6, 2, 4, 0, 1
     };
+    */
+
+    const GLfloat instanceSizes[] = {
+        1.0, 0.1, 0.1, 
+        1.0, 0.2, 0.2, 
+        1.0, 0.3, 0.3,
+        1.0, 0.2, 0.2
+    };
+
+    const GLfloat instancePositions[] {
+        0.0, 0.0, 0.0,
+        sqrt(3), 0.0, 0.0,
+        0.0, sqrt(3), 0.0,
+        sqrt(3), sqrt(3), 0.0
+    };
+
+    const GLfloat instanceRotate[] {
+        45.0, 135.0, 135.0, 45.0
+    };
+
 
     glGenBuffers(1, &vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
+    glGenBuffers(1, &sizebuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, sizebuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(instanceSizes), instanceSizes, GL_STATIC_DRAW);
+    glGenBuffers(1, &positionbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, positionbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(instancePositions), instancePositions, GL_STATIC_DRAW);
+    glGenBuffers(1, &rotatebuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, rotatebuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(instanceRotate), instanceRotate, GL_STATIC_DRAW);
+    
+
+    const GLfloat instanceStart[] = {
+        0.7, 0.0, 0.0, 0.0,
+        0.2, 0.0, 0.0, 0.0,
+        0.0, 0.5, 0.0, 0.0,
+        0.0, 0.2, 0.4, 0.6
+    };
+
+    const GLfloat instanceStop[] = {
+        1.0, 0.0, 0.0, 0.0,
+        0.5, 0.0, 0.0, 0.0,
+        0.3, 1.0, 0.0, 0.0,
+        0.1, 0.3, 0.5, 0.8
+    };
+
+    const GLfloat instanceIndex[] {
+        0.0, -1.0, -1.0, -1.0,
+        1.0, -1.0, -1.0, -1.0,
+        0.0, 2.0, -1.0, -1.0,
+        0.0, 3.0, 4.0, 5.0
+    };
+
+    glGenBuffers(1, &startbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, startbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(instanceStart), instanceStart, GL_STATIC_DRAW);
+    glGenBuffers(1, &stopbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, stopbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(instanceStop), instanceStop, GL_STATIC_DRAW);
+    glGenBuffers(1, &indexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, indexbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(instanceIndex), instanceIndex, GL_STATIC_DRAW);
+
     glGenBuffers(1, &elementbuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,  sizeof(cubeIndices), cubeIndices, GL_STATIC_DRAW);
@@ -268,6 +364,39 @@ void init_ImGUI() {
 }
 
 void draw_cube() {
+    const GLfloat instanceStart[] = {
+        0.7, 0.0, 0.0, 0.0,
+        0.2, 0.0, 0.0, 0.0,
+        0.0, 0.5, 0.0, 0.0,
+        0.0, 0.2, 0.4, 0.6
+    };
+
+    const GLfloat instanceStop[] = {
+        1.0, 0.0, 0.0, 0.0,
+        0.5, 0.0, 0.0, 0.0,
+        0.3, 1.0, 0.0, 0.0,
+        0.1, 0.3, 0.5, 0.8
+    };
+
+    const GLfloat instanceIndex[] {
+        0.0, -1.0, -1.0, -1.0,
+        1.0, -1.0, -1.0, -1.0,
+        0.0, 2.0, -1.0, -1.0,
+        0.0, 3.0, 4.0, 5.0
+    };
+
+    glBindBuffer(GL_ARRAY_BUFFER, startbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(instanceStart), 0, GL_STATIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(instanceStart), instanceStart);
+
+    glBindBuffer(GL_ARRAY_BUFFER, stopbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(instanceStop), 0, GL_STATIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(instanceStop), instanceStop);
+
+    glBindBuffer(GL_ARRAY_BUFFER, indexbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(instanceIndex), 0, GL_STATIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(instanceIndex), instanceIndex);
+
     //////////////////////////////////////////////////////////////////////
     // Draw a cube to a framebuffer texture using orthogonal projection //
     // with camera looking along the negative Z axis                    //
@@ -287,7 +416,9 @@ void draw_cube() {
     // camera movement put in orthogonal projection matrix instead //
     /////////////////////////////////////////////////////////////////
     mat4 View = mat4(1.0f);
-    mat4 Projection = ortho(cam_x, cam_x + cam_width, cam_y, cam_y + cam_height, -2, 2);
+    mat4 Projection = ortho(cam_x, cam_x + cam_width, cam_y, cam_y + cam_height, -10, 10);
+    //mat4 View = view(vec3(1,0,0), vec3(0,1,0), vec3(0,0,-1), vec3(cam_x,cam_y,6));
+    //mat4 Projection = projection(60, resx/float(resy), 0.01, 10.0);
 
     ////////////////////////////////
     // same RNG seed every frame  //
@@ -298,7 +429,7 @@ void draw_cube() {
     float rr1 = (IBM *= 16807)/float((unsigned int)(-1))*2 + 1;      // x-axis, between -1 and 1
     float rr2 = (IBM *= 16807)/float((unsigned int)(-1))*2 + 1;      // y-axis, between -1 and 1
     float rr3 = (IBM *= 16807)/float((unsigned int)(-1))*2 + 1;      // z-axis, between -1 and 1
-    mat4 Model = rotate(vec3(rr1,rr2,rr3), glfwGetTime()*rr);
+    mat4 Model = rotate(vec3(rr1,rr2,rr3), glfwGetTime()*rr*1);
 
     mat4 MVP = Projection*View*Model;
     glUniformMatrix4fv(glGetUniformLocation(cube_program, "MVP"), 1, GL_FALSE, &MVP.M[0][0]); 
@@ -307,8 +438,48 @@ void draw_cube() {
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,(void*)0);
-    glDrawElements(GL_TRIANGLE_STRIP, 14, GL_UNSIGNED_BYTE, (void*)0);
+
+    glEnableVertexAttribArray(1);
+    glBindBuffer(GL_ARRAY_BUFFER, sizebuffer);
+    glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,0,(void*)0);
+
+    glEnableVertexAttribArray(2);
+    glBindBuffer(GL_ARRAY_BUFFER, positionbuffer);
+    glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,0,(void*)0);
+
+    glEnableVertexAttribArray(3);
+    glBindBuffer(GL_ARRAY_BUFFER, rotatebuffer);
+    glVertexAttribPointer(3,1,GL_FLOAT,GL_FALSE,0,(void*)0);
+
+    glEnableVertexAttribArray(4);
+    glBindBuffer(GL_ARRAY_BUFFER, startbuffer);
+    glVertexAttribPointer(4,4,GL_FLOAT,GL_FALSE,0,(void*)0);
+
+    glEnableVertexAttribArray(5);
+    glBindBuffer(GL_ARRAY_BUFFER, stopbuffer);
+    glVertexAttribPointer(5,4,GL_FLOAT,GL_FALSE,0,(void*)0);
+
+    glEnableVertexAttribArray(6);
+    glBindBuffer(GL_ARRAY_BUFFER, indexbuffer);
+    glVertexAttribPointer(6,4,GL_FLOAT,GL_FALSE,0,(void*)0);
+
+    glVertexAttribDivisor(0, 0);
+    glVertexAttribDivisor(1, 1);
+    glVertexAttribDivisor(2, 1);
+    glVertexAttribDivisor(3, 1);
+    glVertexAttribDivisor(4, 1);
+    glVertexAttribDivisor(5, 1);
+    glVertexAttribDivisor(6, 1);
+
+    //glDrawElements(GL_TRIANGLE_STRIP, 14, GL_UNSIGNED_BYTE, (void*)0);
+    glDrawElementsInstanced(GL_TRIANGLE_STRIP, num_indices, GL_UNSIGNED_BYTE, (void*)0, 4);
     glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(2);
+    glDisableVertexAttribArray(3);
+    glDisableVertexAttribArray(4);
+    glDisableVertexAttribArray(5);
+    glDisableVertexAttribArray(6);
 }
 
 void cube_GUI() {
