@@ -574,7 +574,7 @@ int main_menu_GUI() {
             {
                 IM_ASSERT(0);
             }
-            if (ImGui::MenuItem("Fullscreen", NULL, true)) {fullscreen = !fullscreen;}
+            if (ImGui::MenuItem("Fullscreen", NULL, fullscreen)) {fullscreen = !fullscreen;}
             if (ImGui::MenuItem("Quit", "Alt+F4")) {}
             ImGui::EndMenu();
         }
@@ -626,8 +626,8 @@ void do_GUI() {
     }
 
     if (fullscreen) {
-        ImGui::SetNextWindowSize(ImVec2(resx, resy), ImGuiSetCond_Always);
-        ImGui::SetNextWindowPos(ImVec2(0.0, 0.0), ImGuiSetCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(resx, resy-menu_height), ImGuiSetCond_Always);
+        ImGui::SetNextWindowPos(ImVec2(0.0, menu_height), ImGuiSetCond_Always);
         if (ImGui::Begin("Fullscreen", &fullscreen, ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoTitleBar)) {   
             cube_GUI();
 
