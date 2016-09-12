@@ -1152,21 +1152,21 @@ void Print() {
 	for (int i = 0; i < g_dock.m_docks.size(); ++i)
 	{
 		ImGui::Text("i=%d this=0x%.8p state=(%d %d) pos=(%.0f %.0f) size=(%.0f %.0f) children=(%s %s) tabs=(%s %s) parent=%s status=%d  location='%s' label='%s'\n", i, 
-							 (void*)g_dock.m_docks[i],
-							 g_dock.m_docks[i]->active,
-							 g_dock.m_docks[i]->opened,
-							 g_dock.m_docks[i]->pos.x,
-							 g_dock.m_docks[i]->pos.y,
-							 g_dock.m_docks[i]->size.x,
-							 g_dock.m_docks[i]->size.y,
-							 (void*)g_dock.m_docks[i]->children[0] ? g_dock.m_docks[i]->children[0]->label : "None",
-							 (void*)g_dock.m_docks[i]->children[1] ? g_dock.m_docks[i]->children[1]->label : "None",
-							 (void*)g_dock.m_docks[i]->prev_tab ? g_dock.m_docks[i]->prev_tab->label : "None",
-							 (void*)g_dock.m_docks[i]->next_tab ? g_dock.m_docks[i]->next_tab->label : "None",
-							 (void*)g_dock.m_docks[i]->parent ? g_dock.m_docks[i]->parent->label : "None",
-							 g_dock.m_docks[i]->status,
-							 g_dock.m_docks[i]->location,
-							 g_dock.m_docks[i]->label);
+					(void*)g_dock.m_docks[i],
+					g_dock.m_docks[i]->active,
+					g_dock.m_docks[i]->opened,
+					g_dock.m_docks[i]->pos.x,
+					g_dock.m_docks[i]->pos.y,
+					g_dock.m_docks[i]->size.x,
+					g_dock.m_docks[i]->size.y,
+					g_dock.m_docks[i]->children[0] ? g_dock.m_docks[i]->children[0]->label : "None",
+					g_dock.m_docks[i]->children[1] ? g_dock.m_docks[i]->children[1]->label : "None",
+					g_dock.m_docks[i]->prev_tab    ? g_dock.m_docks[i]->prev_tab->label    : "None",
+					g_dock.m_docks[i]->next_tab    ? g_dock.m_docks[i]->next_tab->label    : "None",
+					g_dock.m_docks[i]->parent      ? g_dock.m_docks[i]->parent->label      : "None",
+					g_dock.m_docks[i]->status,
+					g_dock.m_docks[i]->location,
+					g_dock.m_docks[i]->label);
 
 	}
 }
