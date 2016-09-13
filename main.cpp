@@ -340,6 +340,7 @@ void init_ImGUI() {
 }
 
 void draw_cube() {
+    /*
     const GLfloat instanceStart[] = {
         0.7, 0.0, 0.0, 0.0,
         0.0, 0.5, 0.0, 0.0,
@@ -369,6 +370,7 @@ void draw_cube() {
     glBindBuffer(GL_ARRAY_BUFFER, indexbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(instanceIndex), 0, GL_STATIC_DRAW);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(instanceIndex), instanceIndex);
+    */
 
     //////////////////////////////////////////////////////////////////////
     // Draw a cube to a framebuffer texture using orthogonal projection //
@@ -462,7 +464,8 @@ void cube_GUI() {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureX, textureY, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
-
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, textureX, textureY);
     }
 
     draw_cube();
@@ -640,6 +643,18 @@ void do_GUI() {
         ImGui::SetNextWindowSize(ImVec2(resx, resy-menu_height), ImGuiSetCond_Always);
         ImGui::SetNextWindowPos(ImVec2(0.0, menu_height), ImGuiSetCond_Always);
         if (ImGui::Begin("Fullscreen", &fullscreen, ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoTitleBar)) {   
+            ImVec2 size = ImGui::GetContentRegionAvail();
+            if (textureX != size.x || textureY != size.y) {
+                textureX = size.x;
+                textureY = size.y;
+                cam_width = cam_height*textureX/float(textureY);
+
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, texture);
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureX, textureY, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+                glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+                glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, textureX, textureY);
+            }
             cube_GUI();
 
             if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
