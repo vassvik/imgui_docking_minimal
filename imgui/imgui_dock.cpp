@@ -1097,6 +1097,7 @@ struct DockContext
 
 			for (int i = 0; i < ival; i++) {
 				Dock *new_dock = (Dock *) MemAlloc(sizeof(Dock));
+				IM_PLACEMENT_NEW(new_dock) Dock();
 				m_docks.push_back(new_dock);
 			}
 
