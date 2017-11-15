@@ -1097,6 +1097,7 @@ struct DockContext
 
 			for (int i = 0; i < ival; i++) {
 				Dock *new_dock = (Dock *) MemAlloc(sizeof(Dock));
+				IM_PLACEMENT_NEW(new_dock) Dock();
 				m_docks.push_back(new_dock);
 			}
 
@@ -1107,7 +1108,7 @@ struct DockContext
 				char lab[32];
 				
 				fscanf(fp, "%s %d", str2, &id);
-				fscanf(fp, "%s %s", str2, &lab[0]);
+				fscanf(fp, "%s %[^\n]s", str2, &lab[0]);
 				fscanf(fp, "%s %f", str2, &m_docks[id]->pos.x);
 				fscanf(fp, "%s %f", str2, &m_docks[id]->pos.y);
 				fscanf(fp, "%s %f", str2, &m_docks[id]->size.x);
